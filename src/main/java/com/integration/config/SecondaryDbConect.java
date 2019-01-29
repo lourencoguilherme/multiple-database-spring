@@ -6,6 +6,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
@@ -19,29 +20,36 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(entityManagerFactoryRef = "bookEntityManagerFactory", transactionManagerRef = "bookTransactionManager", basePackages = {
-        "com.integration.book.repositories" })
-public class SecondDbConect {
+@EnableJpaRepositories(entityManagerFactoryRef = "secondaryEntityManagerFactory", transactionManagerRef = "secondaryTransactionManager", basePackages = {
+        "com.integration.secondary.repositories"})
+public class SecondaryDbConect {
 
-    @Bean(name = "bookDataSource")
-    @ConfigurationProperties(prefix = "spring.book.datasource")
+    @Value("${spring.secondary.hibernate.hbm2ddl.auto}")
+    private String Auto;
+
+    @Value("${spring.secondary.hibernate.dialect}")
+    private String Dialect;
+
+
+    @Bean(name = "secondaryDataSource")
+    @ConfigurationProperties(prefix = "spring.secondary.datasource")
     public DataSource dataSource() {
         return DataSourceBuilder.create().build();
     }
 
-    @Bean(name = "bookEntityManagerFactory")
+    @Bean(name = "secondaryEntityManagerFactory")
     public LocalContainerEntityManagerFactoryBean bookEntityManagerFactory(EntityManagerFactoryBuilder builder,
-                                                                           @Qualifier("bookDataSource") DataSource dataSource) {
+                                                                           @Qualifier("secondaryDataSource") DataSource dataSource) {
         HashMap<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto", "update");
-        properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
+        properties.put("hibernate.hbm2ddl.auto", Auto);
+        properties.put("hibernate.dialect", Dialect);
         return builder.dataSource(dataSource).properties(properties)
-                .packages("com.integration.book.models").persistenceUnit("Book").build();
+                .packages("com.integration.secondary.models").persistenceUnit("Secondary").build();
     }
 
-    @Bean(name = "bookTransactionManager")
-    public PlatformTransactionManager bookTransactionManager(
-            @Qualifier("bookEntityManagerFactory") EntityManagerFactory bookEntityManagerFactory) {
-        return new JpaTransactionManager(bookEntityManagerFactory);
+    @Bean(name = "secondaryTransactionManager")
+    public PlatformTransactionManager secondaryTransactionManager(
+            @Qualifier("secondaryEntityManagerFactory") EntityManagerFactory secondaryEntityManagerFactory) {
+        return new JpaTransactionManager(secondaryEntityManagerFactory);
     }
 }

@@ -1,4 +1,4 @@
-package com.integration.book.models;
+package com.integration.secondary.models;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

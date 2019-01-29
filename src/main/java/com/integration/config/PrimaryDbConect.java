@@ -17,16 +17,23 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(entityManagerFactoryRef = "entityManagerFactory", basePackages = {
-        "com.integration.user.repositories" })
-public class FirstDbConect {
+        "com.integration.primary.repositories"})
+public class PrimaryDbConect {
+
+    @Value("${spring.primary.hibernate.hbm2ddl.auto}")
+    private String Auto;
+
+    @Value("${spring.primary.hibernate.dialect}")
+    private String Dialect;
+
+
     @Primary
     @Bean(name = "dataSource")
-    @ConfigurationProperties(prefix = "spring.user.datasource")
+    @ConfigurationProperties(prefix = "spring.primary.datasource")
     public DataSource dataSource() {
         return DataSourceBuilder.create().build();
     }
@@ -36,10 +43,10 @@ public class FirstDbConect {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder,
                                                                        @Qualifier("dataSource") DataSource dataSource) {
         HashMap<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto", "update");
-        properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
+        properties.put("hibernate.hbm2ddl.auto", Auto);
+        properties.put("hibernate.dialect", Dialect);
         return builder.dataSource(dataSource).properties(properties)
-                .packages("com.integration.user.models").persistenceUnit("User").build();
+                .packages("com.integration.primary.models").persistenceUnit("Primary").build();
     }
 
     @Primary

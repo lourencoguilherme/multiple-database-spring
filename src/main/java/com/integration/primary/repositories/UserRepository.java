@@ -1,6 +1,6 @@
-package com.integration.user.repositories;
+package com.integration.primary.repositories;
 
-import com.integration.user.models.User;
+import com.integration.primary.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

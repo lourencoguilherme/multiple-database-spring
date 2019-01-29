@@ -1,9 +1,9 @@
 package com.integration;
 
-import com.integration.book.models.Book;
-import com.integration.book.repositories.BookRepository;
-import com.integration.user.models.User;
-import com.integration.user.repositories.UserRepository;
+import com.integration.secondary.models.Book;
+import com.integration.secondary.repositories.BookRepository;
+import com.integration.primary.models.User;
+import com.integration.primary.repositories.UserRepository;
 
 
 import javax.annotation.PostConstruct;

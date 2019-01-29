@@ -1,6 +1,6 @@
-package com.integration.book.repositories;
+package com.integration.secondary.repositories;
 
-import com.integration.book.models.Book;
+import com.integration.secondary.models.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
