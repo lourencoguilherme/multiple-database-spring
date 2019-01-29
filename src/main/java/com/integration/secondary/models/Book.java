@@ -2,9 +2,12 @@ package com.integration.secondary.models;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.io.Serializable;
 
 @Entity
-public class Book {
+public class Book implements Serializable {
+    private static final long serialVersionUID =1L;
+
 
     @Id
     private int id;
