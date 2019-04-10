@@ -1,4 +1,5 @@
-package com.integration.config;
+package com.integration.config.databases;
+
 import java.util.HashMap;
 
 import javax.persistence.EntityManagerFactory;
@@ -11,7 +12,6 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -20,39 +20,38 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(entityManagerFactoryRef = "entityManagerFactory", basePackages = {
-        "com.integration.primary.repositories"})
-public class PrimaryDbConect {
+@EnableJpaRepositories(entityManagerFactoryRef = "secondaryEntityManagerFactory", transactionManagerRef = "secondaryTransactionManager", basePackages = {
+        "com.integration.secondary.repositories"})
+public class SecondaryDbConect {
 
-    @Value("${spring.primary.hibernate.hbm2ddl.auto}")
+    @Value("${spring.secondary.hibernate.hbm2ddl.auto}")
     private String Auto;
 
-    @Value("${spring.primary.hibernate.dialect}")
+    @Value("${spring.secondary.hibernate.dialect}")
     private String Dialect;
 
 
-    @Primary
-    @Bean(name = "dataSource")
-    @ConfigurationProperties(prefix = "spring.primary.datasource")
+    @Bean(name = "secondaryDataSource")
+    @ConfigurationProperties(prefix = "spring.secondary.datasource")
     public DataSource dataSource() {
         return DataSourceBuilder.create().build();
     }
 
-    @Primary
-    @Bean(name = "entityManagerFactory")
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder,
-                                                                       @Qualifier("dataSource") DataSource dataSource) {
+
+    @Bean(name = "secondaryEntityManagerFactory")
+    public LocalContainerEntityManagerFactoryBean secondaryEntityManagerFactory(EntityManagerFactoryBuilder builder,
+                                                                           @Qualifier("secondaryDataSource") DataSource dataSource) {
         HashMap<String, Object> properties = new HashMap<>();
         properties.put("hibernate.hbm2ddl.auto", Auto);
         properties.put("hibernate.dialect", Dialect);
         return builder.dataSource(dataSource).properties(properties)
-                .packages("com.integration.primary.models").persistenceUnit("Primary").build();
+                .packages("com.integration.secondary.models").persistenceUnit("Secondary").build();
     }
 
-    @Primary
-    @Bean(name = "transactionManager")
-    public PlatformTransactionManager transactionManager(
-            @Qualifier("entityManagerFactory") EntityManagerFactory entityManagerFactory) {
-        return new JpaTransactionManager(entityManagerFactory);
+
+    @Bean(name = "secondaryTransactionManager")
+    public PlatformTransactionManager secondaryTransactionManager(
+            @Qualifier("secondaryEntityManagerFactory") EntityManagerFactory secondaryEntityManagerFactory) {
+        return new JpaTransactionManager(secondaryEntityManagerFactory);
     }
 }

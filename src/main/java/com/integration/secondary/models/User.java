@@ -1,4 +1,4 @@
-package com.integration.primary.models;
+package com.integration.secondary.models;
 
 import com.integration.common.domain.Common;
 
